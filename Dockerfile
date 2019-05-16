@@ -4,7 +4,7 @@ FROM scientificlinux/sl:7
 RUN yum update -y && yum install -y epel-release
 
 # requirements for various R/Biocondfuctor packages
-RUN yum install -y R libcurl-devel openssl-devel libxml2-devel tzdata
+RUN yum install -y R libcurl-devel openssl-devel libxml2-devel
 
 # so that R can keep track of installed packages
 RUN mkdir -p /usr/share/doc/R-3.5.2/html
@@ -23,6 +23,9 @@ RUN R -e 'BiocManager::install(c("recount"))'
 
 # install the script
 COPY quickstart.R /root/quickstart.R
+
+# re-install time zone data; not sure why but it's missing by this point
+RUN rpm -ev --nodeps tzdata-2019a-1.el7.noarch && yum install -y tzdata
 
 # run script at startup time
 CMD ["/usr/bin/Rscript", "/root/quickstart.R"]
